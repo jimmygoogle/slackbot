@@ -4,8 +4,6 @@ const { RTMClient } = require('@slack/client');
 let rtm = null;
 let nlp = null;
 
-//const CLIENT_EVENTS = require('@slack/client').CLIENT_EVENTS;
-
 function handleOnAuthenticated(rtmStartData) {
   console.log(`Logged in as ${rtmStartData.name} of team ${rtmStartData.team.name}, but not yet connected to a channel`);
 }
@@ -13,22 +11,23 @@ function handleOnAuthenticated(rtmStartData) {
 function handleOnMessage(message) {
   //console.log(`(channel:${message.channel}) ${message.user} says: ${message.text}`);
   
-  // only send deathbot messages to wit
-  if(message.text.toLowerCase().includes('deathbot')) {
+  // only send jimbot messages to wit
+  if(message.text.toLowerCase().includes('jimbot')) {
     nlp.ask(message.text, (err, res) => {
       if(err) {
         console.log(err);
         return;
       }
-      
-      console.log(res);
+
       try {
+        // the wit api is finicky with the calls or I am not setting something up right in the understanding logic
+        // so if intent isnt set just set it for this exercise
         if(!res.intent || !res.intent[0] || !res.intent[0].value) {
-          throw new Error("Could not get intent");
+          //throw new Error("Could not get intent");
+          res['intent'] = [{value: 'time'}];
         }
-        
-        const intent = require('./intents/' + res.intent[0].value + 'Intent');
-        
+
+        const intent = require('./intents/' + res.intent[0].value + 'Intent');     
         intent.processIntent(res, function(err, res) {
           if(err) {
             console.log(err.message);
@@ -47,7 +46,6 @@ function handleOnMessage(message) {
 }
 
 function addAuthenticatedHandler(rtm, handler) {
-  console.log(rtm);
   rtm.on(rtm.hello, handler);
 }
 

@@ -12,6 +12,7 @@
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
     "moment": "^2.22.2",
+    "moment-timezone": "^0.5.17",
     "superagent": "^3.8.3"
   }
 }
